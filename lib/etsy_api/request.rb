@@ -13,6 +13,13 @@ module EtsyApi
       Response.new(request.get)
     end
 
+    # https://openapi.etsy.com/v2/users/timothyf?api_key=qws5jsgknquo9ym7chkz1y36
+    def self.get_user
+      access = {:access_token => EtsyApi.access_token, :access_secret => EtsyApi.access_secret}
+      request = Request.new('/users/timothyf', access.merge(:api_key => EtsyApi.api_key))
+      Response.new(request.get(EtsyApi.access_token, EtsyApi.access_secret, EtsyApi.api_key, EtsyApi.api_secret))
+    end
+
     def self.post(resource_path, parameters = {})
       request = Request.new(resource_path, parameters)
       Response.new(request.post)
@@ -26,14 +33,6 @@ module EtsyApi
     def self.delete(resource_path, parameters = {})
       request = Request.new(resource_path, parameters)
       Response.new(request.delete)
-    end
-
-    def self.portray(food)
-      if food.downcase == "broccoli"
-        "Gross!"
-      else
-        "Delicious!"
-      end
     end
 
 
@@ -68,7 +67,9 @@ module EtsyApi
 
     # Perform a GET request against the API endpoint and return the raw
     # response data
-    def get
+    def get(access_token, access_secret, api_key, api_secret)
+      # client.get(endpoint_url)
+      client = OAuth::AccessToken.new(consumer(api_key, api_secret), access_token, access_secret)
       client.get(endpoint_url)
     end
 
@@ -141,6 +142,15 @@ module EtsyApi
     end
 
     private
+
+    def consumer(api_key, api_secret) # :nodoc:
+      path = '/v2/oauth/'
+      @consumer ||= OAuth::Consumer.new(api_key, api_secret, {
+        :site               => "https://openapi.etsy.com",
+        :request_token_path => "#{path}request_token?scope=#{[].join('+')}",
+        :access_token_path  => "#{path}access_token"
+      })
+    end
 
     def secure_client
       SecureClient.new(:access_token => @token, :access_secret => @secret)

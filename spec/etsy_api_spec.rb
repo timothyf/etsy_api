@@ -8,12 +8,6 @@ RSpec.describe EtsyApi do
   # end
 
   describe EtsyApi::Request do
-    it "broccoli is gross" do
-      expect(EtsyApi::Request.portray("Broccoli")).to eql("Gross!")
-    end
 
-    it "anything else is delicious" do
-      expect(EtsyApi::Request.portray("Not Broccoli")).to eql("Delicious!")
-    end
   end
 end
