@@ -55,6 +55,7 @@ GEM
       cucumber-cucumber-expressions (~> 10.1, >= 10.1.0)
       cucumber-messages (~> 12.1, >= 12.1.1)
     diff-lcs (1.4.4)
+    dotenv (2.7.6)
     ffi (1.13.1)
     httparty (0.18.1)
       mime-types (~> 3.0)
@@ -104,6 +105,7 @@ DEPENDENCIES
   aruba
   bundler (~> 1.17)
   cucumber
+  dotenv
   etsy_api!
   rake (~> 10.0)
   rspec (~> 3.0)
