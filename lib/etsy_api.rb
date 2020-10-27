@@ -1,6 +1,9 @@
 require "etsy_api/version"
 require 'etsy_api/request'
 require 'etsy_api/response'
+require 'etsy_api/element'
+require 'etsy_api/shop'
+require 'etsy_api/listing'
 require 'oauth'
 require 'json'
 

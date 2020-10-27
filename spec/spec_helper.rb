@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "etsy_api"
+require 'etsy_api/shop'
 require 'dotenv/load'
 
 RSpec.configure do |config|
