@@ -10,7 +10,7 @@ module EtsyApi
     # A Response object with the payload data
     def self.get(resource_path, parameters = {})
       setup
-      request = Request.new(resource_path, @@access.merge(:api_key => EtsyApi.api_key))
+      request = EtsyApi::Request.new(resource_path, @@access.merge(:api_key => EtsyApi.api_key))
       Response.new(request.get(EtsyApi.access_token, EtsyApi.access_secret, EtsyApi.api_key, EtsyApi.api_secret))
     end
 
@@ -41,8 +41,8 @@ module EtsyApi
     # Create a new request for the resource with optional parameters
     def initialize(resource_path, parameters = {})
       parameters = parameters.dup
-      @token = parameters.delete(:access_token) || Etsy.credentials[:access_token]
-      @secret = parameters.delete(:access_secret) || Etsy.credentials[:access_secret]
+      @token = parameters.delete(:access_token) || EtsyApi.credentials[:access_token]
+      @secret = parameters.delete(:access_secret) || EtsyApi.credentials[:access_secret]
       raise("Secure connection required. Please provide your OAuth credentials via :access_token and :access_secret in the parameters") if parameters.delete(:require_secure) && !secure?
       @multipart_request = parameters.delete(:multipart)
       @resource_path = resource_path
@@ -58,7 +58,7 @@ module EtsyApi
           end
         end
       end
-      parameters = parameters.merge(:api_key => Etsy.api_key) unless secure?
+      parameters = parameters.merge(:api_key => EtsyApi.api_key) unless secure?
       @parameters = parameters
     end
 

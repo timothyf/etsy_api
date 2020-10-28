@@ -1,4 +1,6 @@
-RSpec.describe EtsyApi do
+require 'spec_helper'
+
+describe EtsyApi do
   it "has a version number" do
     expect(EtsyApi::VERSION).not_to be nil
   end
@@ -7,7 +9,5 @@ RSpec.describe EtsyApi do
   #   expect(false).to eq(true)
   # end
 
-  describe EtsyApi::Request do
 
-  end
 end

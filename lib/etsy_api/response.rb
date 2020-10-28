@@ -6,6 +6,7 @@ module EtsyApi
   class ResourceUnavailable < TemporaryIssue; end
   class ExceededRateLimit < TemporaryIssue; end
   class InvalidUserID < StandardError; end
+  class NetHTTPForbidden < StandardError; end
   class EtsyJSONInvalid < StandardError
     attr_reader :code, :data
     def initialize(args)
@@ -33,11 +34,11 @@ module EtsyApi
     end
 
     def body
-      @raw_response.body
+      @raw_response[:body]
     end
 
     def code
-      @raw_response.code
+      @raw_response[:code]
     end
 
     # Number of records in the response results
@@ -75,7 +76,7 @@ module EtsyApi
     private
 
     def data
-      @raw_response.body
+      @raw_response[:body]
     end
 
     def json
@@ -89,6 +90,7 @@ module EtsyApi
       raise TemporaryIssue            if temporary_etsy_issue?
       raise ResourceUnavailable       if resource_unavailable?
       raise ExceededRateLimit         if exceeded_rate_limit?
+      raise NetHTTPForbidden          if net_http_forbidden?
       raise EtsyJSONInvalid.new({:code => code, :data => data}) unless valid_json?
       true
     end
@@ -102,6 +104,10 @@ module EtsyApi
 
     def token_revoked?
       data == "oauth_problem=token_revoked"
+    end
+
+    def net_http_forbidden?
+      data =~ /Net::HTTPForbidden/
     end
 
     def missing_shop_id?
