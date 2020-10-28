@@ -67,6 +67,7 @@ module EtsyApi
           result = response.result
         end
 
+
         [result].flatten.map do |data|
           if options[:access_token] && options[:access_secret]
             new(data, options[:access_token], options[:access_secret])

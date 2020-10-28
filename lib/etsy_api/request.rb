@@ -9,7 +9,7 @@ module EtsyApi
     # Perform a GET request for the resource with optional parameters - returns
     # A Response object with the payload data
     def self.get(resource_path, parameters = {})
-      setup
+      setup(parameters)
       request = EtsyApi::Request.new(resource_path, @@access.merge(:api_key => EtsyApi.api_key))
       Response.new(request.get(EtsyApi.access_token, EtsyApi.access_secret, EtsyApi.api_key, EtsyApi.api_secret))
     end
@@ -71,7 +71,8 @@ module EtsyApi
     def get(access_token, access_secret, api_key, api_secret)
       # client.get(endpoint_url)
       client = OAuth::AccessToken.new(consumer(api_key, api_secret), access_token, access_secret)
-      client.get(endpoint_url)
+      result = client.get(endpoint_url)
+      {:body => result.body, :code => result.code}
     end
 
     def post
@@ -144,8 +145,8 @@ module EtsyApi
 
     private
 
-    def self.setup
-      @@access = {:access_token => EtsyApi.access_token, :access_secret => EtsyApi.access_secret}
+    def self.setup(parameters)
+      @@access = {:access_token => parameters[:access_token], :access_secret => parameters[:access_secret]}
     end
 
     def consumer(api_key, api_secret) # :nodoc:

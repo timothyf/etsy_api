@@ -10,19 +10,6 @@ describe EtsyApi::User do
 
     it "should be able to find a single user" do
       users = mock_request('/users/littletjane', {:access_secret=>nil, :access_token=>nil, :api_key=>nil}, 'User', 'getUser.single.json')
-      # users = [{
-      #     "count": 1,
-      #     "results": [{
-      #         "user_id": 5327518,
-      #         "login_name": "littletjane",
-      #         "creation_tsz": 1191381578,
-      #         "referred_by_user_id": nil,
-      #         "feedback_info": {
-      #             "count": 417,
-      #             "score": 100
-      #         }
-      #     }]
-      # }]
       expect(EtsyApi::User.find('littletjane')).to eql(users.first)
     end
 
@@ -68,7 +55,57 @@ describe EtsyApi::User do
       end
     end
 
+    context "with public response data" do
+      before(:each) do
+        data = read_fixture('user/getUser.single.json')
+        @user = EtsyApi::User.new(data.first)
+      end
 
+      it "should have an ID" do
+        expect(@user.id).to eql(5327518)
+      end
+
+      it "should have a :username" do
+        expect(@user.username).to eql('littletjane')
+      end
+
+      it "should have a value for :created" do
+        expect(@user.created).to eql(1191381578)
+      end
+
+      it "should not have an email address" do
+        expect(@user.email).to be_nil
+      end
+    end
+
+    context "with private response data" do
+      before(:each) do
+        data = read_fixture('user/getUser.single.private.json')
+        @user = EtsyApi::User.new(data.first, 'token', 'secret')
+      end
+
+      it "shoud have an email address" do
+        expect(@user.email).to eql('reaganpr@gmail.com')
+      end
+    end
+
+    context "requested with associated shops" do
+      before(:each) do
+        data = read_fixture('user/getUser.single.withShops.json')
+        @user = EtsyApi::User.new(data.first)
+      end
+
+      it "should have shops" do
+        @user.shops.each do |shop|
+          expect(shop.class).to eql(EtsyApi::Shop)
+        end
+      end
+
+      # This assumes for now that a user can have only one shop belonging to them
+      it "should return the first shop belonging to the user" do
+        expect(@user.shop).to eql(@user.shops.first)
+      end
+    end
   end
 
 end
@@ -85,57 +122,7 @@ end
 #
 #     context "An instance of the User class" do
 #
-#       context "with public response data" do
-#         setup do
-#           data = read_fixture('user/getUser.single.json')
-#           @user = User.new(data.first)
-#         end
 #
-#         should "have an ID" do
-#           @user.id.should == 5327518
-#         end
-#
-#         should "have a :username" do
-#           @user.username.should == 'littletjane'
-#         end
-#
-#         should "have a value for :created" do
-#           @user.created.should == 1191381578
-#         end
-#
-#         should "not have an email address" do
-#           @user.email.should be_nil
-#         end
-#       end
-#
-#       context "with private response data" do
-#         setup do
-#           data = read_fixture('user/getUser.single.private.json')
-#           @user = User.new(data.first, 'token', 'secret')
-#         end
-#
-#         should "have an email address" do
-#           @user.email.should == 'reaganpr@gmail.com'
-#         end
-#       end
-#
-#       context "requested with associated shops" do
-#         setup do
-#           data = read_fixture('user/getUser.single.withShops.json')
-#           @user = User.new(data.first)
-#         end
-#
-#         should "have shops" do
-#           @user.shops.each do |shop|
-#             shop.class.should == Shop
-#           end
-#         end
-#
-#         # This assumes for now that a user can have only one shop belonging to them
-#         should "return the first shop belonging to the user" do
-#           @user.shop.should == @user.shops.first
-#         end
-#       end
 #
 #       context "requested without associated shops" do
 #         setup do

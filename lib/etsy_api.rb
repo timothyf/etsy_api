@@ -94,7 +94,9 @@ module EtsyApi
   end
 
   def self.user(username)
-    EtsyApi::User.find(username)
+    EtsyApi::User.find(username, {:access_secret=>EtsyApi.access_secret,
+                                  :access_token=>EtsyApi.access_token,
+                                  :api_key=>EtsyApi.api_key})
   end
 
   def self.myself(token, secret, options = {})
@@ -113,16 +115,16 @@ module EtsyApi
     nil
   end
 
-  # def self.access_token(request_token, request_secret, verifier)
-  #   @access_token = begin
-  #     client = EtsyApi::SecureClient.new({
-  #       :request_token  => request_token,
-  #       :request_secret => request_secret,
-  #       :verifier       => verifier
-  #     })
-  #     client.client
-  #   end
-  # end
+  def self.get_access_token(request_token, request_secret, verifier)
+    @access_token = begin
+      client = EtsyApi::SecureClient.new({
+        :request_token  => request_token,
+        :request_secret => request_secret,
+        :verifier       => verifier
+      })
+      client.client
+    end
+  end
 
   def self.credentials
     @credentials || {}
