@@ -15,9 +15,10 @@ def mock_request(endpoint, options, resource, file)
   underscored_fixture_filename = "#{resource.gsub(/([^^])([A-Z])/, '\1_\2').downcase}/#{file}"
   response_data = raw_fixture_data(underscored_fixture_filename)
 
+
   expect(EtsyApi::Request.stub(:new)
           .with(endpoint, options)
-          .and_return(EtsyApi::Request.stub(:get).and_return(EtsyApi::Response.new(stub(:body => response_data, :code => '200'))))) 
+          .and_return(EtsyApi::Request.stub(:get).and_return(EtsyApi::Response.new(stub(:body => response_data, :code => '200')))))
 
   JSON.parse(response_data)['results'].each_with_index do |result, index|
     object = "#{resource.downcase}_#{index}"

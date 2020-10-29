@@ -146,7 +146,8 @@ module EtsyApi
     private
 
     def self.setup(parameters)
-      @@access = {:access_token => parameters[:access_token], :access_secret => parameters[:access_secret]}
+      #@@access = {:access_token => parameters[:access_token], :access_secret => parameters[:access_secret]}
+      @@access = {:access_token => EtsyApi.access_token, :access_secret => EtsyApi.access_secret}
     end
 
     def consumer(api_key, api_secret) # :nodoc:
