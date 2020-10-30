@@ -39,7 +39,9 @@ module EtsyApi
 
 
     attr_reader :title, :listing_id, :state, :description, :url, :view_count,
-                :created_at, :modified_at, :ending_at, :price, :quantity, :currency
+                :created_at, :modified_at, :ending_at, :price, :quantity, :currency,
+                :tags, :materials, :hue, :saturation, :brightness, :black_and_white,
+                :images
 
     def initialize(result)
       @title = result['title']
@@ -60,7 +62,20 @@ module EtsyApi
       @price = result['price']
       @quantity = result['quantity']
       @currency  = result['currency_code']
+      @tags = result['tags']
+      @materials = result['materials']
+      @hue = result['hue']
+      @saturation = result['saturation']
+      @brightness = result['brightness']
+      @black_and_white = result['is_black_and_white']
+
+      # if result && result["Images"]
+      #   @images = result["Images"].map { |hash| Image.new(hash) }
+      # else
+      #   @images = EtsyApi::Image.find_all_by_listing_id(@listing_id)
+      # end
     end
+
 
     private
 

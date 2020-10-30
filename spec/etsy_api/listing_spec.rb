@@ -2,29 +2,31 @@ require 'spec_helper'
 require 'dotenv/load'
 require 'etsy_api/about'
 require 'etsy_api/transaction'
+require 'etsy_api/image'
 
 
 describe EtsyApi::Listing do
+
+  before(:each) do
+    EtsyApi.api_key = ENV['ETSY_API_KEY']
+    EtsyApi.access_token = ENV['ETSY_ACCESS_TOKEN']
+    EtsyApi.access_secret = ENV['ETSY_ACCESS_SECRET']
+    EtsyApi.api_secret = ENV['ETSY_API_SECRET']
+  end
 
   context "The Listing class" do
 
     it "should be able to find a single listing" do
       listings = mock_request('/listings/123', {}, 'Listing', 'getListing.single.json')
-      EtsyApi::Listing.find_by_id(123).should == listings.first
+      expect(EtsyApi::Listing.find_by_id(123)).to eql(listings.first)
     end
 
     it "should be able to find multiple listings" do
       listings = mock_request('/listings/123,456', {}, 'Listing', 'getListing.multiple.json')
-      EtsyApi::Listing.find_by_ids('123', '456').should == listings
+      expect(EtsyApi::Listing.find_by_ids('123', '456')).to eql(listings)
     end
 
     context "within the scope of a shop" do
-      before(:each) do
-        EtsyApi.api_key = ENV['ETSY_API_KEY']
-        EtsyApi.access_token = ENV['ETSY_ACCESS_TOKEN']
-        EtsyApi.access_secret = ENV['ETSY_ACCESS_SECRET']
-        EtsyApi.api_secret = ENV['ETSY_API_SECRET']
-      end
 
       it "should be able to find the first 25 active listings" do
         listings = mock_request('/shops/1/listings/active', {}, 'Listing', 'findAllShopListings.json')
@@ -141,6 +143,43 @@ describe EtsyApi::Listing do
           expect(@listing.ending_at).to eql(Time.at(1298178000))
         end
 
+        it "should have a value for :tags" do
+          expect(@listing.tags).to eql(%w(tag_1 tag_2))
+        end
+
+        it "should have a value for :materials" do
+          expect(@listing.materials).to eql(%w(material_1 material_2))
+        end
+
+        it "should have a value for :hue" do
+          expect(@listing.hue).to eql(0)
+        end
+
+        it "should have a value for :saturation" do
+          expect(@listing.saturation).to eql(0)
+        end
+
+        it "should have a value for :brightness" do
+          expect(@listing.brightness).to eql(100)
+        end
+
+        it "should have a value for :black_and_white" do
+          expect(@listing.black_and_white).to eql(false)
+        end
+
+      end
+
+      context "with oauth" do
+        # it "should have a collection of images" do
+        #   listing = EtsyApi::Listing.new({})
+        #   listing.stub(:id).with(no_args).and_return(1)
+        #   listing.stub(:token).with(no_args).and_return("token")
+        #   listing.stub(:secret).with(no_args).and_return("secret")
+        #
+        #   EtsyApi::Image.stub(:find_all_by_listing_id).with(1, {access_token: "token", access_secret: "secret"}).and_return('images')
+        #
+        #   expect(listing.images).to eql('images')
+        # end
       end
 
     end
@@ -151,30 +190,30 @@ end
 
 
 #
-#         should "pass options through to the listing call" do
+#         it "should pass options through to the listing call" do
 #           transaction_1 = stub(:listing_id => 1)
 #           transaction_2 = stub(:listing_id => 2)
 #
 #           Transaction.stubs(:find_all_by_shop_id).with(1, {:other => :params}).returns [transaction_1, transaction_2]
 #           Listing.stubs(:find).with([1, 2], {:other => :params}).returns(['listings'])
 #
-#           Listing.find_all_by_shop_id(1, :state => :sold, :other => :params).should == ['listings']
+#           Listing.find_all_by_shop_id(1, :state => :sold, :other => :params)).to eql(['listings']
 #
 #         end
 #
-#         should "not ask the API for listings if there are no transactions" do
+#         it "should not ask the API for listings if there are no transactions" do
 #           Transaction.stubs(:find_all_by_shop_id).with(1, {}).returns([])
 #           Listing.expects(:find).never
 #           Listing.sold_listings(1, {})
 #         end
 #
-#         should "be able to override limit and offset" do
+#         it "should be able to override limit and offset" do
 #           options = {:limit => 100, :offset => 100}
 #           listings = mock_request('/shops/1/listings/active', options, 'Listing', 'findAllShopListings.json')
-#           Listing.find_all_by_shop_id(1, options).should == listings
+#           Listing.find_all_by_shop_id(1, options)).to eql(listings
 #         end
 #
-#         should "raise an exception when calling with an invalid state" do
+#         it "should raise an exception when calling with an invalid state" do
 #           options = {:state => :awesome}
 #           lambda { Listing.find_all_by_shop_id(1, options) }.should raise_error(ArgumentError)
 #         end
@@ -182,9 +221,9 @@ end
 #       end
 #
 #       context "within the scope of a category" do
-#         should "be able to find active listings" do
+#         it "should be able to find active listings" do
 #           active_listings = mock_request('/listings/active', {:category => 'accessories'}, 'Listing', 'findAllListingActive.category.json')
-#           Listing.find_all_active_by_category('accessories').should == active_listings
+#           Listing.find_all_active_by_category('accessories')).to eql(active_listings
 #         end
 #       end
 #
@@ -192,43 +231,17 @@ end
 #
 #     context "An instance of the Listing class" do
 #
-#       context "with response data" do
 
 #
-#         should "have a value for :tags" do
-#           @listing.tags.should == %w(tag_1 tag_2)
-#         end
-#
-#         should "have a value for :materials" do
-#           @listing.materials.should == %w(material_1 material_2)
-#         end
-#
-#         should "have a value for :hue" do
-#           @listing.hue.should == 0
-#         end
-#
-#         should "have a value for :saturation" do
-#           @listing.saturation.should == 0
-#         end
-#
-#         should "have a value for :brightness" do
-#           @listing.brightness.should == 100
-#         end
-#
-#         should "have a value for :black_and_white?" do
-#           @listing.black_and_white?.should == false
-#         end
-#       end
-#
 #       %w(active removed sold_out expired alchemy).each do |state|
-#         should "know that the listing is #{state}" do
+#         it "should know that the listing is #{state}" do
 #           listing = Listing.new
 #           listing.expects(:state).with().returns(state.sub('_', ''))
 #
 #           listing.send("#{state}?".to_sym).should be(true)
 #         end
 #
-#         should "know that the listing is not #{state}" do
+#         it "should know that the listing is not #{state}" do
 #           listing = Listing.new
 #           listing.expects(:state).with().returns(state.reverse)
 #
@@ -236,32 +249,20 @@ end
 #         end
 #       end
 #
-#       context "with oauth" do
-#         should "have a collection of images" do
-#           listing = Listing.new
-#           listing.stubs(:id).with().returns(1)
-#           listing.stubs(:token).with().returns("token")
-#           listing.stubs(:secret).with().returns("secret")
-#
-#           Image.stubs(:find_all_by_listing_id).with(1, {access_token: "token", access_secret: "secret"}).returns('images')
-#
-#           listing.images.should == 'images'
-#         end
-#       end
 #
 #       context "without oauth" do
-#         should "have a collection of images" do
+#         it "should have a collection of images" do
 #           listing = Listing.new
 #           listing.stubs(:id).with().returns(1)
 #
 #           Image.stubs(:find_all_by_listing_id).with(1, {}).returns('images')
 #
-#           listing.images.should == 'images'
+#           listing.images).to eql('images'
 #         end
 #       end
 #
 #       context "with included images" do
-#         should "not hit the API to get images" do
+#         it "should not hit the API to get images" do
 #           data = read_fixture('listing/getListing.single.includeImages.json')
 #           listing = Listing.new(data.first)
 #           Request.expects(:get).never
@@ -270,11 +271,11 @@ end
 #         end
 #       end
 #
-#       should "have a default image" do
+#       it "should have a default image" do
 #         listing = Listing.new
 #         listing.stubs(:images).with().returns(%w(image_1 image_2))
 #
-#         listing.image.should == 'image_1'
+#         listing.image).to eql('image_1'
 #       end
 #
 #     end
@@ -288,10 +289,10 @@ end
 #           @favorite_listings = [listing_1, listing_2]
 #         end
 #
-#         should "have all listings" do
+#         it "should have all listings" do
 #           FavoriteListing.stubs(:find_all_listings_favored_by).with(@listing.id, {:access_token => nil, :access_secret => nil}).returns(@favorite_listings)
 #           User.stubs(:find).with([1, 2], {:access_token => nil, :access_secret => nil}).returns(['users'])
-#           @listing.admirers({:access_token => nil, :access_secret => nil}).should == ['users']
+#           @listing.admirers({:access_token => nil, :access_secret => nil})).to eql(['users']
 #         end
 #       end
 #   end

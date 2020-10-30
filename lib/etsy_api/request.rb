@@ -14,6 +14,12 @@ module EtsyApi
       Response.new(request.get(EtsyApi.access_token, EtsyApi.access_secret, EtsyApi.api_key, EtsyApi.api_secret))
     end
 
+    def self.get_all(resource_path, parameters = {})
+      setup(parameters)
+      request = EtsyApi::Request.new(resource_path, @@access.merge(:api_key => EtsyApi.api_key))
+      Response.new(request.get(EtsyApi.access_token, EtsyApi.access_secret, EtsyApi.api_key, EtsyApi.api_secret))
+    end
+
     # https://openapi.etsy.com/v2/users/timothyf?api_key=qws5jsgknquo9ym7chkz1y36
     def self.get_user(user_id)
       setup
