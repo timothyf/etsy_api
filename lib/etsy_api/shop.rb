@@ -75,6 +75,10 @@ module EtsyApi
       listings
     end
 
+    def about
+      About.find_by_shop(self)
+    end
+
   end
 
 end

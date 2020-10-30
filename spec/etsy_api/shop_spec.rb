@@ -1,14 +1,29 @@
 require 'spec_helper'
 require 'dotenv/load'
+require 'etsy_api/about'
 
 
 describe EtsyApi::Shop do
+
+  before(:each) do
+    EtsyApi.api_key = ENV['ETSY_API_KEY']
+    EtsyApi.access_token = ENV['ETSY_ACCESS_TOKEN']
+    EtsyApi.access_secret = ENV['ETSY_ACCESS_SECRET']
+    EtsyApi.api_secret = ENV['ETSY_API_SECRET']
+  end
 
   context "The Shop class" do
 
     it "should be able to find a single shop" do
       shops = mock_request('/shops/littletjane', {}, 'Shop', 'getShop.single.json')
       expect(EtsyApi::Shop.find_by_id('littletjane')).to eql(shops.first)
+    end
+
+    it "gets a shop by shop_id" do
+      shop = EtsyApi::Shop.find_by_id('20343394')
+      expect(shop).not_to eql(nil)
+      expect(shop.shop_id).to eql(20343394)
+      expect(shop.shop_name).to eql('TheHorrorWorkshop')
     end
 
     it "should be able to find multiple shops" do
@@ -34,12 +49,6 @@ describe EtsyApi::Shop do
   end
 
   context "An instance of the Shop class" do
-    before(:each) do
-      EtsyApi.api_key = ENV['ETSY_API_KEY']
-      EtsyApi.access_token = ENV['ETSY_ACCESS_TOKEN']
-      EtsyApi.access_secret = ENV['ETSY_ACCESS_SECRET']
-      EtsyApi.api_secret = ENV['ETSY_API_SECRET']
-    end
 
     context "with response data" do
       before(:each) do
@@ -100,6 +109,12 @@ describe EtsyApi::Shop do
       end
     end
 
+    it "should have an About object" do
+      shop = EtsyApi::Shop.new({})
+      EtsyApi::About.stub(:find_by_shop).with(shop).and_return('about')
+      expect(shop.about).to eql('about')
+    end
+
     # it "should have a collection of listings" do
     #   shop = EtsyApi::Shop.new({'shop_id' => 1})
     #   #shop.stub(:shop_id).with().and_return(1)
@@ -119,66 +134,17 @@ describe EtsyApi::Shop do
       #expect(listings[0]['title']).to eql('ORCA Boat Sign - Wreckage from JAWS')
       #expect(listings[0]['title']).to eql('Michael Myers Vinyl Decal')
     end
+
+    it "gets active listings for a shop OBJ" do
+      shop = EtsyApi::Shop.find_by_id('20343394')
+      listings = shop.get_listings_active
+      expect(listings).not_to eql(nil)
+      expect(listings.count).to be > 0
+
+      # examine a listing
+      #expect(listings[0].title).to eql('ORCA Boat Sign - Wreckage from JAWS')
+      #expect(listings[0].title).to eql('Michael Myers Vinyl Decal')
+    end
   end
 
 end
-
-#
-# module Etsy
-#   class ShopTest < Test::Unit::TestCase
-#
-#
-#     context "An instance of the Shop class" do
-#
-#
-#
-#       should "have an About object" do
-#         shop = Shop.new
-#
-#         About.stubs(:find_by_shop).with(shop).returns('about')
-#
-#         shop.about.should == 'about'
-#       end
-#     end
-#
-#   end
-# end
-
-
-
-
-
-
-
-# RSpec.describe EtsyApi::Shop do
-#
-#   describe EtsyApi::Shop do
-#
-#     before(:each) do
-#       EtsyApi.api_key = ENV['ETSY_API_KEY']
-#       EtsyApi.access_token = ENV['ETSY_ACCESS_TOKEN']
-#       EtsyApi.access_secret = ENV['ETSY_ACCESS_SECRET']
-#       EtsyApi.api_secret = ENV['ETSY_API_SECRET']
-#     end
-#
-#     it "gets a shop by shop_id" do
-#       shop = EtsyApi::Shop.get_by_id('20343394')
-#       expect(shop).not_to eql(nil)
-#       expect(shop.shop_id).to eql(20343394)
-#       expect(shop.shop_name).to eql('TheHorrorWorkshop')
-#     end
-#
-#     it "gets active listings for a shop OBJ" do
-#       shop = EtsyApi::Shop.get_by_id('20343394')
-#       listings = shop.get_listings_active
-#       expect(listings).not_to eql(nil)
-#       expect(listings.count).to be > 0
-#
-#       # examine a listing
-#       #expect(listings[0].title).to eql('ORCA Boat Sign - Wreckage from JAWS')
-#       expect(listings[0].title).to eql('Michael Myers Vinyl Decal')
-#     end
-#
-#   end
-#
-# end
